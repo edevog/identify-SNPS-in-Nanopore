@@ -1,0 +1,109 @@
+% trial .tex file from keziamanlove.com/latex-in-rstudio%
+\documentclass[10pt]{article}  % specifies document class (article) and point size (10pt)
+
+\usepackage{enumitem}
+
+%Do I need this for bibliography?
+\usepackage{csquotes}
+\usepackage[style=authoryear]{biblatex}
+\addbibresource{references.bib}
+
+%Don't think this will work
+\bibliography{references.bib}
+
+\begin{document}               % starts document
+
+\title{An Analysis of Errors in R2C2 Sequencing}       % specifies big, fancy title
+\author{Elizabeth DeVogelaere, Craig Hunter, Dennis Russel Mulligan}
+\maketitle                     % constructs big, fancy title
+
+
+\twocolumn
+
+\section*{Abstract} 
+This is a test abstract.
+
+\section{Introduction} 
+Volden et al. have developed a method for Nanopore sequencing [@voldenImprovingNanoporeRead2018]
+
+%\cite{voldenImprovingNanoporeRead2018}
+%<<echo=FALSE>>=
+%library("citr")
+%#citr::insert_citation("volden", bib_file="references.bib")
+%citr::md_cite("Volden", bib_file="references.bib")
+%@
+
+
+\section{Data Manipulation} 
+
+\section{Data} 
+<<echo=FALSE>>=
+#message( "Create a dataframe for nanopore current levels"  )
+
+#getwd()
+#This will break other people's setups 
+#So set this line to your directory or better,    
+#Set the direcotry in Rstudio:Tools:Global Options
+#:Default Working Directory
+#setwd( "C:/Users/Craig/Desktop/AMS204/Project" )
+levels = read.table("levels.txt",  
+    header=TRUE, sep="\t" ) 
+
+hist (levels$level_mean, breaks=80, main="Histogram of Nanopore Current Levels", xlab="Current Level (pA)", ylab="Hexamer Count (of 4096 possible)"  )
+
+hist (levels$level_stdv, breaks=80, main="Histogram of Standard Deviations of Nanopore Current Level", xlab="Standard Deviation of Current Level (pA)", ylab="Hexamer Count (of 4096 possible)", xlim=c(0,6)  )
+
+kmers = read.table("kmers.out.txt",  
+    header=TRUE, sep="\t" ) 
+
+#install.packages("sqldf")
+suppressMessages(library("sqldf"))
+
+#kmer.levels = merge(kmers, levels, by.x="Errors", by.y="kmer")
+
+#kmer.levels = merge(kmers.levels, levels, by.x="Correct", by.y="kmer")
+
+kmers10 = head(kmers)
+kmers1000 = head(kmers, n=1000)
+
+kmer.levels10 = sqldf( 'SELECT a.Errors, a.Correct, b.level_mean AS error_level, c.level_mean AS correct_level FROM kmers10 a, levels b, levels c WHERE a.Errors = b.kmer AND a.Correct = c.kmer LIMIT 10 ' )
+
+kmer.levels1000 = sqldf( 'SELECT a.Errors, a.Correct, b.level_mean AS error_level, c.level_mean AS correct_level FROM kmers1000 a, levels b, levels c WHERE a.Errors = b.kmer AND a.Correct = c.kmer LIMIT 1000 ' )
+
+#Important, but too slow for a document
+#Need to pull this out
+#kmer.levels = sqldf( 'SELECT a.Errors, a.Correct, b.level_mean AS error_level, c.level_mean AS correct_level FROM kmers a, levels b, levels c WHERE a.Errors = b.kmer AND a.Correct = c.kmer ' )
+
+#hist( abs(kmer.levels10$error_level - kmer.levels10$correct_level), main="Differences in Current Between Recognized and Reference Hexamers", xlab="Difference in Current (pA)", ylab="Number of Hexamer Pairs", breaks=50)
+
+hist( abs(kmer.levels1000$error_level - kmer.levels1000$correct_level), main="Differences in Current Between Recognized and Reference Hexamers", xlab="Difference in Current (pA)", ylab="Number of Hexamer Pairs", breaks=50)
+
+#Important, but takes too long for document 
+#hist( abs(kmer.levels$error_level - kmer.levels$correct_level), main="Differences in Current Between Recognized and Reference Hexamers", xlab="Difference in Current (pA)", ylab="Number of Hexamer Pairs", breaks=50)
+
+hist( abs(kmer.levels1000$error_level - kmer.levels1000$correct_level), main="Differences in Current Between Recognized and Reference Hexamers", xlab="Difference in Current (pA)", ylab="Number of Hexamer Pairs", breaks=50)
+
+
+
+@
+
+\section{Exploratory Data Analysis} 
+
+\section{Method} 
+
+\section{Model} 
+
+\section{Goodness of Fit} 
+
+\section*{References} 
+<<echo=FALSE>>=
+library("citr")
+@
+
+\nocite{*}
+\printbibliography
+
+
+\onecolumn
+
+\end{document}                 % ends document
