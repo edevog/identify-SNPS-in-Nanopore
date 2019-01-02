@@ -1,10 +1,11 @@
-# R2C2-Errors
-AMS204 project to analyze the errors in R2C2 reads
+# Identify Miscalled Bases in Nanopore sequenced cDNA 
+Statistical analysis in R. Data polishing and wrangling in Python.
+
 
 Contributors:
 ================================================================================
 Craig Hunter                chunter@ucsc.edu 
-Beth DeVogelaere            edevogel@ucsc.edu   
+Elizabeth DeVogelaere            edevogel@ucsc.edu   
 Dennis Russell Mulligan     dmulliga@ucsc.edu 
 
 
